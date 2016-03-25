@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Layout like app with JpegCamera</title>
+  <style media="screen">
+    .hidden {
+      display: none;
+    }
+
+    .camera {
+      background-color: #eee;
+      display: inline-block;
+      height: 300px;
+      margin: 0.5em;
+      width: 250px;
+    }
+
+    .gallery canvas, .layouts canvas {
+      margin-right: 10px;
+      max-height: 200px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row" id="camera-wrapper">
+      <div class="camera" id="camera"></div>
+      <button id="shoot">Take snapshot</button>
+    </div>
+    <div class="row">
+      <div class="span-sm-6 layouts" id="layout-options">
+      </div>
+      <ul class="span-sm-6 gallery" id="gallery">
+      </ul>
+    </div>
+  </div>
+  <script type="text/javascript" src="js/libs/jquery-1.12.1.min.js"></script>
+  <script type="text/javascript" src="js/libs/underscore-min.js"></script>
+  <script type="text/javascript" src="js/libs/jpeg_camera/jpeg_camera_with_dependencies.min.js"></script>
+  <script type="text/javascript" src="js/src/layouts.js"></script>
+  <script type="text/javascript" src="js/src/layout.js"></script>
+  <script type="text/javascript">
+    LayoutApp.init();
+  </script>
+</body>
+</html>
