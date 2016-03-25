@@ -34,21 +34,39 @@
           gallery.append(canvas);
         },
 
-        setVerticalLayoutData = function(destinationCanvas, imageQty, imageIndex) {
-          return {
-            sourceX: 0,
-            sourceY: destinationCanvas.height() / imageQty,
-            sourceWidth: destinationCanvas.width(),
-            sourceHeight: destinationCanvas.height() / imageQty,
-            destinationX: 0,
-            destinationY: destinationCanvas.height() / imageQty * (imageIndex + 1),
-            destinationWidth: destinationCanvas.width(),
-            destinationHeight: destinationCanvas.height() / imageQty * (imageIndex + 1)
+        setImageHeight = function(layout, canvas) {
+          if(Layouts.isAll(layout.height.value)) {
+            return $(canvas).height();
           }
+
+          return layout.height.value / layout.height.divider;
         },
 
-        setHorizontalLayoutData = function(destinationCanvas, imageQty, imageIndex) {
+        setImageWidth = function(layout, canvas) {
+          if(Layouts.isAll(layout.width.value)) {
+            return $(canvas).width();
+          }
 
+          return layout.width.value / layout.width.divider;
+        },
+
+        setImageCoordinates = function(canvas, layout, imageHeight, imageWidth, imageIndex) {
+          if(Layouts.isHorizontal(layout)) {
+            return {
+              x: imageIndex * imageHeight,
+              y: 0
+            }
+          } else if(Layouts.isVertical(layout)) {
+            return {
+              x: 0,
+              y: imageIndex * imageHeight
+            }
+          }
+
+          return {
+            x: 0,
+            y: 0
+          }
         },
 
         updateLayouts = function(canvas) {
@@ -56,37 +74,42 @@
           layoutOptions.html('');
 
           for(var i = 0, layout; layout = layouts[i]; i++) {
-            var destinationCanvas = document.createElement(CANVAS),
-                context = destinationCanvas.getContext('2d');
+            var canvas = document.createElement(CANVAS),
+                context = canvas.getContext('2d');
 
-            $(destinationCanvas).height(MAX_MEASURE);
-            $(destinationCanvas).width(MAX_MEASURE);
+            $(canvas).height(MAX_MEASURE);
+            $(canvas).width(150); // @Todo: Improve this
 
             for(var j = 0, image; image = images[j]; j++) {
-              var imageData = {};
+              var imageHeight = setImageHeight(layout, canvas),
+                  imageWidth = setImageWidth(layout, canvas),
+                  coordinates = setImageCoordinates(canvas, layout, imageHeight, imageWidth, j);
 
-              if(Layouts.isVertical(layout)) {
-                imageData = setVerticalLayoutData(destinationCanvas, images.length, j);
-              } else if(Layouts.isHorizontal(layout)) {
-                // imageData = setHorizontalLayoutData(destinationCanvas, images.length, j);
-              } else if(layout.callback) {
-                /**
-                 * Execute layout callback here
-                 */
-              }
-
-              if(imageData.sourceX) {
-                context.drawImage(canvas, imageData.sourceX, imageData.sourceY, imageData.sourceWidth, imageData.sourceHeight, imageData.destinationX, imageData.destinationY, imageData.destinationWidth, imageData.destinationHeight);
-              }
+              context.drawImage(image._canvas, coordinates.x, coordinates.y, imageWidth, imageHeight);
             }
 
-            layoutOptions.append(destinationCanvas);
+            layoutOptions.append(canvas);
           }
         },
 
+        /**
+         * To be completed
+         */
+        updateImages = function(snapshot) {
+          newImages = [];
+
+          for(var i = 0, image; image = images[i]; i++) {
+            newImages.push(image);
+          }
+
+          if(newImages.length < MAX_IMAGES) {
+
+          }
+
+          images = newImages;
+        },
+
         updateView = function(canvas) {
-          images.push(canvas);
-          
           updateGallery(canvas);
           updateLayouts(canvas);
         },
@@ -95,6 +118,8 @@
           var snapshot = camera.capture();
 
           if(images.length < MAX_IMAGES) {
+            // updateImages(snapshot);
+            images.push(snapshot);
             snapshot.get_canvas(updateView);
           }
         },
