@@ -85,6 +85,8 @@
         },
 
         updateView = function(canvas) {
+          images.push(canvas);
+          
           updateGallery(canvas);
           updateLayouts(canvas);
         },
