@@ -34,66 +34,28 @@
           gallery.append($(canvas).height(200));
         },
 
-        // setImageHeight = function(layout, canvas) {
-        //   if(Layouts.isAll(layout.height.value)) {
-        //     return $(canvas).height();
-        //   }
-        //
-        //   return layout.height.value / layout.height.divider;
-        // },
-        //
-        // setImageWidth = function(layout, canvas) {
-        //   if(Layouts.isAll(layout.width.value)) {
-        //     return $(canvas).width();
-        //   }
-        //
-        //   return layout.width.value / layout.width.divider;
-        // },
-        //
-        // setImageCoordinates = function(canvas, layout, imageHeight, imageWidth, imageIndex) {
-        //   if(Layouts.isHorizontal(layout)) {
-        //     return {
-        //       x: imageIndex * imageHeight,
-        //       y: 0
-        //     }
-        //   } else if(Layouts.isVertical(layout)) {
-        //     return {
-        //       x: 0,
-        //       y: imageIndex * imageHeight
-        //     }
-        //   }
-        //
-        //   return {
-        //     x: 0,
-        //     y: 0
-        //   }
-        // },
-
-        setImageHeight = function(layout, targetCanvas) {
+        setImageMeasures = function(layout, targetCanvas) {
           if(Layouts.isVertical(layout)) {
-            return $(targetCanvas).height() / images.length;
+            return {
+              width: $(targetCanvas).width(),
+              height: $(targetCanvas).height() / images.length
+            };
           } else if(Layouts.isHorizontal(layout)) {
-            return $(targetCanvas).height();
+            return {
+              width: $(targetCanvas).width() / images.length,
+              height: $(targetCanvas).height()
+            };
           } else if(layout.callback && layout.callback.constructor === 'Function') {
-            layout.callback();
+            return layout.callback(layout, targetCanvas, images);
           }
 
-          return $(targetCanvas).height();
+          return {
+            width: $(targetCanvas).width(),
+            height: $(targetCanvas).height()
+          };
         },
 
-        setImageWidth = function(layout, targetCanvas) {
-          if(Layouts.isVertical(layout)) {
-            return $(targetCanvas).width();
-          } else if(Layouts.isHorizontal(layout)) {
-            return $(targetCanvas).width() / images.length;
-          } else if(layout.callback && layout.callback.constructor === 'Function') {
-            layout.callback();
-          }
-
-          return $(targetCanvas).width();
-        },
-
-        setImageCoordinates = function(targetCanvas, layout, imageHeight, imageWidth, imageIndex) {
+        setImageCoordinates = function(targetCanvas, layout, imageWidth, imageHeight, imageIndex) {
           if(Layouts.isVertical(layout)) {
             return {
               x: 0,
@@ -107,23 +69,35 @@
           }
         },
 
+        /**
+         * Fix to the intrinsic width as per:
+         * http://stackoverflow.com/questions/3186150/image-draws-stretched-to-html-canvas-when-created-using-jquery
+         */
+        setUpCanvas = function() {
+          var elem = $('<canvas>', {
+                width: MAX_MEASURE,
+                height: MAX_MEASURE
+              }),
+              targetCanvas = elem[0];
+
+          targetCanvas.width = targetCanvas.height = MAX_MEASURE;
+          return targetCanvas;
+        },
+
         updateLayouts = function(canvas) {
           // ctx.drawImage(image, dx, dy, dWidth, dHeight);
           layoutOptions.html('');
 
           for(var i = 0, layout; layout = layouts[i]; i++) {
-            var elem = $("<canvas>", {width:MAX_MEASURE, height:MAX_MEASURE});
-            var targetCanvas = elem[0];
-            targetCanvas.width = targetCanvas.height = MAX_MEASURE;
-
-            var context = targetCanvas.getContext('2d');
+            var targetCanvas = setUpCanvas(),
+                context = targetCanvas.getContext('2d'),
+                imageMeasure = setImageMeasures(layout, targetCanvas);
 
             for(var j = 0, image; image = images[j]; j++) {
-              var imageHeight = setImageHeight(layout, targetCanvas),
-                  imageWidth = setImageWidth(layout, targetCanvas),
-                  coordinates = setImageCoordinates(targetCanvas, layout, imageHeight, imageWidth, j);
+              var coordinates = setImageCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j);
 
-              context.drawImage(image._canvas, coordinates.x, coordinates.y, imageWidth, imageHeight);
+              // context.drawImage(image._canvas, coordinates.x, coordinates.y, imageWidth, imageHeight);
+              context.drawImage(image._canvas, coordinates.x, coordinates.y, imageMeasure.width, imageMeasure.height);
             }
 
             layoutOptions.append(targetCanvas);
@@ -148,8 +122,6 @@
         },
 
         updateView = function(canvas) {
-          $(canvas).height(MAX_MEASURE);
-          $(canvas).width(MAX_MEASURE);
           updateGallery(canvas);
           updateLayouts(canvas);
         },
