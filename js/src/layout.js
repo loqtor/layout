@@ -96,29 +96,17 @@
             for(var j = 0, image; image = images[j]; j++) {
               var coordinates = setImageCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j);
 
-              // context.drawImage(image._canvas, coordinates.x, coordinates.y, imageWidth, imageHeight);
               context.drawImage(image._canvas, coordinates.x, coordinates.y, imageMeasure.width, imageMeasure.height);
+              // context.drawImage(image._canvas, 0, 0, imageMeasure.width, imageMeasure.height, coordinates.x, coordinates.y, imageMeasure.width, imageMeasure.height);
+              // if(Layouts.isVertical(layout)) {
+              //   context.drawImage(image._canvas, 0, 0, imageMeasure.width, imageMeasure.height, coordinates.x, coordinates.y, imageMeasure.width, imageMeasure.height / images.length);
+              // } else if(Layouts.isHorizontal(layout)) {
+              //   context.drawImage(image._canvas, 0, 0, imageMeasure.width, imageMeasure.height, coordinates.x, coordinates.y, imageMeasure.width / images.length, imageMeasure.height);
+              // }
             }
 
             layoutOptions.append(targetCanvas);
           }
-        },
-
-        /**
-         * To be completed
-         */
-        updateImages = function(snapshot) {
-          newImages = [];
-
-          for(var i = 0, image; image = images[i]; i++) {
-            newImages.push(image);
-          }
-
-          if(newImages.length < MAX_IMAGES) {
-
-          }
-
-          images = newImages;
         },
 
         updateView = function(canvas) {
@@ -130,14 +118,19 @@
           var snapshot = camera.capture();
 
           if(images.length < MAX_IMAGES) {
-            // updateImages(snapshot);
             images.push(snapshot);
             snapshot.get_canvas(updateView);
           }
         },
 
+        download = function(e) {
+          var canvas = e.target;
+          window.open(canvas.toDataURL().replace("image/png", "image/octet-stream"));
+        },
+
         bindEvents = function() {
           $('#camera-wrapper').on('click', '#shoot', capture);
+          $('#layout-options').on('click', 'canvas', download)
         };
 
     return {
