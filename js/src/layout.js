@@ -7,6 +7,7 @@
   window.LayoutApp = (function() {
 
     var images = [],
+        canvases = [],
 
         layoutOptions = $('#layout-options'),
         gallery = $('#gallery'),
@@ -84,8 +85,24 @@
           return targetCanvas;
         },
 
+        /**
+         * To ensure the correct ratio when drawing in the new canvas.
+         */
+        calculateCoeficient = function(targetCanvas, sourceCanvas) {
+          return {
+            width: sourceCanvas.width / targetCanvas.width,
+            height: sourceCanvas.height / targetCanvas.height
+          }
+        },
+
+        setSourceCoordinates = function(canvas, canvases, imageWidth, imageHeight) {
+          return {
+            x: (imageWidth / canvases) / 2,
+            y: (imageHeight / canvases) / 2
+          };
+        },
+
         updateLayouts = function(canvas) {
-          // ctx.drawImage(image, dx, dy, dWidth, dHeight);
           layoutOptions.html('');
 
           for(var i = 0, layout; layout = layouts[i]; i++) {
@@ -93,16 +110,12 @@
                 context = targetCanvas.getContext('2d'),
                 imageMeasure = setImageMeasures(layout, targetCanvas);
 
-            for(var j = 0, image; image = images[j]; j++) {
-              var coordinates = setImageCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j);
+            for(var j = 0, canvas; canvas = canvases[j]; j++) {
+              var targetCoordinates = setImageCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
+                  coeficient = calculateCoeficient(targetCanvas, canvas),
+                  sourceCoordinates = setSourceCoordinates(targetCanvas, canvases.length, imageMeasure.width, imageMeasure.height);
 
-              context.drawImage(image._canvas, coordinates.x, coordinates.y, imageMeasure.width, imageMeasure.height);
-              // context.drawImage(image._canvas, 0, 0, imageMeasure.width, imageMeasure.height, coordinates.x, coordinates.y, imageMeasure.width, imageMeasure.height);
-              // if(Layouts.isVertical(layout)) {
-              //   context.drawImage(image._canvas, 0, 0, imageMeasure.width, imageMeasure.height, coordinates.x, coordinates.y, imageMeasure.width, imageMeasure.height / images.length);
-              // } else if(Layouts.isHorizontal(layout)) {
-              //   context.drawImage(image._canvas, 0, 0, imageMeasure.width, imageMeasure.height, coordinates.x, coordinates.y, imageMeasure.width / images.length, imageMeasure.height);
-              // }
+              context.drawImage(canvas, sourceCoordinates.x, sourceCoordinates.y, imageMeasure.width * coeficient.width, imageMeasure.height * coeficient.height, targetCoordinates.x, targetCoordinates.y, imageMeasure.width, imageMeasure.height);
             }
 
             layoutOptions.append(targetCanvas);
@@ -110,6 +123,8 @@
         },
 
         updateView = function(canvas) {
+          canvases.push(canvas);
+
           updateGallery(canvas);
           updateLayouts(canvas);
         },
