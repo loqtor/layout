@@ -6,8 +6,16 @@
 
   window.LayoutApp = (function() {
 
-    var images = [],
+    var CANVAS = 'canvas',
+        MAX_IMAGES = Layouts.getImagesPerLayout(),
+        MAX_MEASURE = Layouts.getCanvasMaxHeight(),
+
+        images = [],
         canvases = [],
+        measuresSet = false,
+        measures = {
+          width: MAX_MEASURE
+        },
 
         layoutOptions = $('#layout-options'),
         gallery = $('#gallery'),
@@ -15,9 +23,6 @@
 
         layouts = Layouts.getLayouts(),
 
-        CANVAS = 'canvas',
-        MAX_IMAGES = Layouts.getImagesPerLayout(),
-        MAX_MEASURE = Layouts.getCanvasMaxHeight(),
 
         initCamera = function() {
           if(!window.JpegCamera) {
@@ -32,7 +37,7 @@
         },
 
         updateGallery = function(canvas) {
-          gallery.append($(canvas).height(200));
+          gallery.append(canvas);
         },
 
         setImageMeasures = function(layout, targetCanvas) {
@@ -56,7 +61,7 @@
           };
         },
 
-        setImageCoordinates = function(targetCanvas, layout, imageWidth, imageHeight, imageIndex) {
+        setTargetCoordinates = function(targetCanvas, layout, imageWidth, imageHeight, imageIndex) {
           if(Layouts.isVertical(layout)) {
             return {
               x: 0,
@@ -74,14 +79,17 @@
          * Fix to the intrinsic width as per:
          * http://stackoverflow.com/questions/3186150/image-draws-stretched-to-html-canvas-when-created-using-jquery
          */
-        setUpCanvas = function() {
+        setUpCanvas = function(sourceCanvas) {
           var elem = $('<canvas>', {
-                width: MAX_MEASURE,
-                height: MAX_MEASURE
+                // width: sourceCanvas.width / 2,
+                // height: sourceCanvas.height / 2
+                width: measures.width,
+                height: measures.height
               }),
               targetCanvas = elem[0];
 
-          targetCanvas.width = targetCanvas.height = MAX_MEASURE;
+          targetCanvas.width = measures.width;
+          targetCanvas.height = measures.height;
           return targetCanvas;
         },
 
@@ -95,25 +103,37 @@
           }
         },
 
-        setSourceCoordinates = function(canvas, canvases, imageWidth, imageHeight) {
-          return {
-            x: (imageWidth / canvases) / 2,
-            y: (imageHeight / canvases) / 2
-          };
+        setSourceCoordinates = function(canvas, layout, imageWidth, imageHeight) {
+          if(Layouts.isVertical(layout)) {
+            return {
+              x: 0,
+              y: canvas.height / 2 - imageHeight / 2
+            };
+          } else if(Layouts.isHorizontal(layout)) {
+            return {
+              x: canvas.width / 2 - imageWidth / 2,
+              y: 0
+            };
+          }
+
+          // return {
+          //   x: (imageWidth / canvases),
+          //   y: (imageHeight / canvases)
+          // };
         },
 
-        updateLayouts = function(canvas) {
+        updateLayouts = function(sourceCanvas) {
           layoutOptions.html('');
 
           for(var i = 0, layout; layout = layouts[i]; i++) {
-            var targetCanvas = setUpCanvas(),
+            var targetCanvas = setUpCanvas(sourceCanvas),
                 context = targetCanvas.getContext('2d'),
                 imageMeasure = setImageMeasures(layout, targetCanvas);
 
             for(var j = 0, canvas; canvas = canvases[j]; j++) {
-              var targetCoordinates = setImageCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
-                  coeficient = calculateCoeficient(targetCanvas, canvas),
-                  sourceCoordinates = setSourceCoordinates(targetCanvas, canvases.length, imageMeasure.width, imageMeasure.height);
+              var targetCoordinates = setTargetCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
+                  sourceCoordinates = setSourceCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height),
+                  coeficient = calculateCoeficient(targetCanvas, canvas);
 
               context.drawImage(canvas, sourceCoordinates.x, sourceCoordinates.y, imageMeasure.width * coeficient.width, imageMeasure.height * coeficient.height, targetCoordinates.x, targetCoordinates.y, imageMeasure.width, imageMeasure.height);
             }
@@ -122,20 +142,29 @@
           }
         },
 
+        setCanvasMeasures = function(canvas) {
+          measures.height = canvas.height * MAX_MEASURE / canvas.width;
+        },
+
         updateView = function(canvas) {
           canvases.push(canvas);
 
+          if(!measuresSet) {
+            setCanvasMeasures(canvas);
+            measuresSet = true;
+          }
+
           updateGallery(canvas);
-          updateLayouts(canvas);
+
+          if(canvases.length <= MAX_IMAGES) {
+            updateLayouts(canvas);
+          }
         },
 
         capture = function() {
           var snapshot = camera.capture();
-
-          if(images.length < MAX_IMAGES) {
-            images.push(snapshot);
-            snapshot.get_canvas(updateView);
-          }
+          images.push(snapshot);
+          snapshot.get_canvas(updateView);
         },
 
         download = function(e) {
