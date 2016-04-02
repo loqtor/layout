@@ -131,8 +131,8 @@
                 imageMeasure = setImageMeasures(layout, targetCanvas);
 
             for(var j = 0, canvas; canvas = canvases[j]; j++) {
-              var targetCoordinates = setTargetCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
-                  sourceCoordinates = setSourceCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height),
+              var sourceCoordinates = setSourceCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height),
+                  targetCoordinates = setTargetCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
                   coeficient = calculateCoeficient(targetCanvas, canvas);
 
               context.drawImage(canvas, sourceCoordinates.x, sourceCoordinates.y, imageMeasure.width * coeficient.width, imageMeasure.height * coeficient.height, targetCoordinates.x, targetCoordinates.y, imageMeasure.width, imageMeasure.height);
