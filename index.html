@@ -4,50 +4,33 @@
   <meta charset="UTF-8">
   <title>Layout like app with JpegCamera</title>
   <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-  <style media="screen">
-    html, body {
-      background: black;
-      color: #f5f5f5;
-    },
-
-    .hidden {
-      display: none;
-    }
-
-    .camera {
-      background-color: #eee;
-      display: inline-block;
-      height: 300px;
-      margin: 0.5em;
-      width: 250px;
-    }
-
-    .gallery canvas, .layouts canvas {
-      margin-right: 10px;
-      height: 200px;
-      overflow: hidden;
-    }
-  </style>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" rel="stylesheet" crossorigin="anonymous">
+  <link href='https://fonts.googleapis.com/css?family=Oxygen:700,400' rel='stylesheet' type='text/css'>
+  <link href="styles/styles.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-  <div class="container">
+  <header class="insta-bkg">
     <h1>Layout like app with JpegCamera and canvas</h1>
+  </header>
+  <div class="container page-wrap">
     <div class="row col-lg-5 col-md-5 col-sm-5" id="camera-wrapper">
       <div id="camera-wrapper">
         <div class="camera" id="camera"></div>
       </div>
-      <button class="btn btn-lg btn-primary" id="shoot">Take snapshot</button>
+      <button class="btn btn-lg btn-primary trigger" id="shoot">Shoot</button>
     </div>
     <div class="row col-lg-7 col-md-7 col-sm-7">
-      <h2>Layouts</h2>
+      <h2 class="section-header">Layouts</h2>
       <div class="layouts" id="layout-options">
       </div>
-      <h2>Images</h2>
+      <h2 class="section-header">Images</h2>
       <div class="gallery" id="gallery">
       </div>
     </div>
   </div>
+  <footer class="insta-bkg">
+    &copy; Sitepoint 2016
+  </footer>
   <script type="text/javascript" src="js/libs/jquery-1.12.1.min.js"></script>
   <script type="text/javascript" src="js/libs/underscore-min.js"></script>
   <script type="text/javascript" src="js/libs/jpeg_camera/jpeg_camera_with_dependencies.min.js"></script>
