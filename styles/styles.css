@@ -52,14 +52,14 @@ footer, .page-wrap:after {
 }
 
 .trigger:after {
-  content: '';
-  position:absolute;
-  bottom: 5px;
-  top: 5px;
-  left: 5px;
-  right: 5px;
   border: 2px solid white;
   border-radius: 50%;
+  bottom: 5px;
+  content: '';
+  left: 5px;
+  position:absolute;
+  right: 5px;
+  top: 5px;
 }
 
 .section-header {
@@ -68,8 +68,13 @@ footer, .page-wrap:after {
 
 .gallery canvas, .layouts canvas {
   margin-right: 10px;
-  height: 200px;
+  height: 240px;
   overflow: hidden;
+}
+
+.layouts canvas {
+  cursor: pointer;
+  position: relative;
 }
 
 footer {

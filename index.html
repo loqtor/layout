@@ -6,6 +6,7 @@
   <!-- Latest compiled and minified CSS -->
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" rel="stylesheet" crossorigin="anonymous">
   <link href='https://fonts.googleapis.com/css?family=Oxygen:700,400' rel='stylesheet' type='text/css'>
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
   <link href="styles/styles.css" rel="stylesheet" type="text/css">
 </head>
 <body>
@@ -20,11 +21,13 @@
       <button class="btn btn-lg btn-primary trigger" id="shoot">Shoot</button>
     </div>
     <div class="row col-lg-7 col-md-7 col-sm-7">
-      <h2 class="section-header">Layouts</h2>
+      <h2 class="section-header">Layouts <small>(click on the layout to download the image)</small></h2>
       <div class="layouts" id="layout-options">
+        <small>You Layouts will appear here</small>
       </div>
-      <h2 class="section-header">Images</h2>
+      <h2 class="section-header">Photos</h2>
       <div class="gallery" id="gallery">
+        <small>Your photos will appear here</small>
       </div>
     </div>
   </div>
@@ -37,7 +40,9 @@
   <script type="text/javascript" src="js/src/layouts.js"></script>
   <script type="text/javascript" src="js/src/layout.js"></script>
   <script type="text/javascript">
-    LayoutApp.init();
+    (function() {
+      LayoutApp.init();
+    })();
   </script>
 </body>
 </html>
