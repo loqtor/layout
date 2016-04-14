@@ -1,4 +1,4 @@
-(function(window, document, jQuery, undefined) {
+(function(window, document, jQuery, Custom, undefined) {
 
   if(!window.LayoutApp) {
     window.LayoutApp = {};
@@ -15,23 +15,9 @@
         },
         LAYOUTS = [
           {
-            height: {
-              value: CANVAS_MAX_MEASURE,
-              divider: IMAGES_PER_LAYOUT
-            },
-            width: {
-              value: ALL
-            },
             type: LAYOUT_TYPES.VERTICAL
           },
           {
-            height: {
-              value: ALL
-            },
-            width: {
-              value: CANVAS_MAX_MEASURE,
-              divider: IMAGES_PER_LAYOUT
-            },
             type: LAYOUT_TYPES.HORIZONTAL
           }
         ];
@@ -47,7 +33,7 @@
       },
 
       getLayouts: function() {
-        return LAYOUTS;
+        return LAYOUTS.concat(Custom.getCustomLayouts());
       },
 
       isAll: function(value) {
@@ -66,4 +52,4 @@
 
   })();
 
-})(window, document, jQuery);
+})(window, document, jQuery, window.LayoutApp.Custom);

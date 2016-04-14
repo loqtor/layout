@@ -24,6 +24,13 @@
 
         layouts = Layouts.getLayouts(),
 
+        /**
+         * It was not worth it a new modules just because of this function,
+         * but still sounds so weird having this here.
+         */
+        isFunction = function(f) {
+          return f && f.constructor === Function;
+        },
 
         initCamera = function () {
           if(!window.JpegCamera) {
@@ -43,38 +50,75 @@
           gallery.append(canvas);
         },
 
-        setImageMeasures = function (layout, targetCanvas) {
-          if(Layouts.isVertical(layout)) {
+        setImageMeasures = function (layout, targetCanvas, imageIndex) {
+          if (isFunction(layout.setImageMeasures)) {
+            return layout.setImageMeasures(layout, targetCanvas, imageIndex);
+          } else {
+            if(Layouts.isVertical(layout)) {
+              return {
+                width: $(targetCanvas).width(),
+                height: $(targetCanvas).height() / images.length
+              };
+            } else if(Layouts.isHorizontal(layout)) {
+              return {
+                width: $(targetCanvas).width() / images.length,
+                height: $(targetCanvas).height()
+              };
+            }
+
             return {
               width: $(targetCanvas).width(),
-              height: $(targetCanvas).height() / images.length
-            };
-          } else if(Layouts.isHorizontal(layout)) {
-            return {
-              width: $(targetCanvas).width() / images.length,
               height: $(targetCanvas).height()
             };
           }
+        },
 
-          return {
-            width: $(targetCanvas).width(),
-            height: $(targetCanvas).height()
-          };
+        setSourceCoordinates = function (canvas, layout, imageWidth, imageHeight, imageIndex) {
+          if(isFunction(layout.setSourceCoordinates)) {
+            return layout.setSourceCoordinates(canvas, layout, imageWidth, imageHeight, imageIndex);
+          } else {
+            if(Layouts.isVertical(layout)) {
+              return {
+                x: 0,
+                y: canvas.height / 2 - imageHeight / 2
+              };
+            } else if(Layouts.isHorizontal(layout)) {
+              return {
+                x: canvas.width / 2 - imageWidth / 2,
+                y: 0
+              };
+            }
+          }
         },
 
         setTargetCoordinates = function (targetCanvas, layout, imageWidth, imageHeight, imageIndex) {
-          if(Layouts.isVertical(layout)) {
-            return {
-              x: 0,
-              y: imageHeight * imageIndex
-            };
-          } else if(Layouts.isHorizontal(layout)) {
-            return {
-              x: imageWidth * imageIndex,
-              y: 0
-            };
+          if (isFunction(layout.setTargetCoordinates)) {
+            return layout.setTargetCoordinates(targetCanvas, layout, imageWidth, imageHeight, imageIndex);
+          } else {
+            if(Layouts.isVertical(layout)) {
+              return {
+                x: 0,
+                y: imageHeight * imageIndex
+              };
+            } else if(Layouts.isHorizontal(layout)) {
+              return {
+                x: imageWidth * imageIndex,
+                y: 0
+              };
+            }
           }
         },
+
+        /**
+        * To ensure the correct ratio when drawing in the new canvas.
+        */
+        calculateCoeficient = function (targetCanvas, sourceCanvas) {
+          return {
+            width: sourceCanvas.width / targetCanvas.width,
+            height: sourceCanvas.height / targetCanvas.height
+          }
+        },
+
 
         /**
          * Fix to the intrinsic width as per:
@@ -92,42 +136,18 @@
           return targetCanvas;
         },
 
-        /**
-         * To ensure the correct ratio when drawing in the new canvas.
-         */
-        calculateCoeficient = function (targetCanvas, sourceCanvas) {
-          return {
-            width: sourceCanvas.width / targetCanvas.width,
-            height: sourceCanvas.height / targetCanvas.height
-          }
-        },
-
-        setSourceCoordinates = function (canvas, layout, imageWidth, imageHeight) {
-          if(Layouts.isVertical(layout)) {
-            return {
-              x: 0,
-              y: canvas.height / 2 - imageHeight / 2
-            };
-          } else if(Layouts.isHorizontal(layout)) {
-            return {
-              x: canvas.width / 2 - imageWidth / 2,
-              y: 0
-            };
-          }
-        },
-
         updateLayouts = function (sourceCanvas) {
           layoutOptions.html('');
 
           for(var i = 0, layout; layout = layouts[i]; i++) {
             var targetCanvas = setUpCanvas(),
-                context = targetCanvas.getContext('2d'),
-                imageMeasure = setImageMeasures(layout, targetCanvas);
+                context = targetCanvas.getContext('2d');
 
             for(var j = 0, canvas; canvas = canvases[j]; j++) {
-              var sourceCoordinates = setSourceCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height),
-              targetCoordinates = setTargetCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
-              coeficient = calculateCoeficient(targetCanvas, canvas);
+              var imageMeasure = setImageMeasures(layout, targetCanvas, j),
+                  sourceCoordinates = setSourceCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
+                  targetCoordinates = setTargetCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
+                  coeficient = calculateCoeficient(targetCanvas, canvas);
 
               context.drawImage(canvas, sourceCoordinates.x, sourceCoordinates.y, imageMeasure.width * coeficient.width, imageMeasure.height * coeficient.height, targetCoordinates.x, targetCoordinates.y, imageMeasure.width, imageMeasure.height);
             }
