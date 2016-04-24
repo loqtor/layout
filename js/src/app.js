@@ -1,14 +1,9 @@
 (function (window, document, $, Layouts, undefined) {
 
-  if(!window.LayoutApp) {
-    window.LayoutApp = {};
-  }
-
   window.LayoutApp = (function () {
 
     var CANVAS = 'canvas',
-        MAX_IMAGES = Layouts.getImagesPerLayout(),
-        MAX_MEASURE = Layouts.getCanvasMaxHeight(),
+        MAX_MEASURE = Layouts.getCanvasMaxWidth(),
 
         images = [],
         canvases = [],
@@ -36,7 +31,13 @@
           if(!window.JpegCamera) {
             alert('Camera access is not available in your browser');
           } else {
-            camera = new JpegCamera('#camera').ready().error(function () {
+            camera = new JpegCamera('#camera')
+              .ready(function () {
+                /**
+                 * Something you'd need to do if the camera is ready.
+                 */
+              })
+              .error(function () {
               alert('Camera access was denied');
             });
           }

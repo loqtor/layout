@@ -6,9 +6,7 @@
 
   window.LayoutApp.Layouts = (function() {
 
-    var IMAGES_PER_LAYOUT = 4,
-        CANVAS_MAX_MEASURE = 200,
-        ALL = 'all',
+    var CANVAS_MAX_MEASURE = 200,
         LAYOUT_TYPES = {
           HORIZONTAL: 'horizontal',
           VERTICAL: 'vertical'
@@ -24,20 +22,12 @@
 
     return {
 
-      getImagesPerLayout: function() {
-        return IMAGES_PER_LAYOUT;
-      },
-
-      getCanvasMaxHeight: function() {
+      getCanvasMaxWidth: function() {
         return CANVAS_MAX_MEASURE;
       },
 
       getLayouts: function() {
         return LAYOUTS.concat(Custom.getCustomLayouts());
-      },
-
-      isAll: function(value) {
-        return value === ALL;
       },
 
       isHorizontal: function(layout) {
