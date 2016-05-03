@@ -36,6 +36,10 @@
 
       isVertical: function(layout) {
         return layout.type === LAYOUT_TYPES.VERTICAL;
+      },
+
+      isAvailable: function(layout, totalImages) {
+        return !layout.minImages || layout.minImages <= totalImages;
       }
 
     }

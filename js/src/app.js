@@ -20,7 +20,7 @@
         layouts = Layouts.getLayouts(),
 
         /**
-         * It was not worth it a new modules just because of this function,
+         * It was not worth it having a new module just because of this function,
          * but still sounds so weird having this here.
          */
         isFunction = function(f) {
@@ -28,7 +28,7 @@
         },
 
         initCamera = function () {
-          if(!window.JpegCamera) {
+          if (!window.JpegCamera) {
             alert('Camera access is not available in your browser');
           } else {
             camera = new JpegCamera('#camera')
@@ -55,12 +55,12 @@
           if (isFunction(layout.setImageMeasures)) {
             return layout.setImageMeasures(layout, targetCanvas, imageIndex);
           } else {
-            if(Layouts.isVertical(layout)) {
+            if (Layouts.isVertical(layout)) {
               return {
                 width: $(targetCanvas).width(),
                 height: $(targetCanvas).height() / images.length
               };
-            } else if(Layouts.isHorizontal(layout)) {
+            } else if (Layouts.isHorizontal(layout)) {
               return {
                 width: $(targetCanvas).width() / images.length,
                 height: $(targetCanvas).height()
@@ -75,15 +75,15 @@
         },
 
         setSourceCoordinates = function (canvas, layout, imageWidth, imageHeight, imageIndex) {
-          if(isFunction(layout.setSourceCoordinates)) {
+          if (isFunction(layout.setSourceCoordinates)) {
             return layout.setSourceCoordinates(canvas, layout, imageWidth, imageHeight, imageIndex);
           } else {
-            if(Layouts.isVertical(layout)) {
+            if (Layouts.isVertical(layout)) {
               return {
                 x: 0,
                 y: canvas.height / 2 - imageHeight / 2
               };
-            } else if(Layouts.isHorizontal(layout)) {
+            } else if (Layouts.isHorizontal(layout)) {
               return {
                 x: canvas.width / 2 - imageWidth / 2,
                 y: 0
@@ -96,12 +96,12 @@
           if (isFunction(layout.setTargetCoordinates)) {
             return layout.setTargetCoordinates(targetCanvas, layout, imageWidth, imageHeight, imageIndex);
           } else {
-            if(Layouts.isVertical(layout)) {
+            if (Layouts.isVertical(layout)) {
               return {
                 x: 0,
                 y: imageHeight * imageIndex
               };
-            } else if(Layouts.isHorizontal(layout)) {
+            } else if (Layouts.isHorizontal(layout)) {
               return {
                 x: imageWidth * imageIndex,
                 y: 0
@@ -141,19 +141,21 @@
           layoutOptions.html('');
 
           for(var i = 0, layout; layout = layouts[i]; i++) {
-            var targetCanvas = setUpCanvas(),
-                context = targetCanvas.getContext('2d');
+            if (Layouts.isAvailable(layout, canvases.length)) {
+              var targetCanvas = setUpCanvas(),
+                  context = targetCanvas.getContext('2d');
 
-            for(var j = 0, canvas; canvas = canvases[j]; j++) {
-              var imageMeasure = setImageMeasures(layout, targetCanvas, j),
-                  sourceCoordinates = setSourceCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
-                  targetCoordinates = setTargetCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
-                  coeficient = calculateCoeficient(targetCanvas, canvas);
+              for(var j = 0, canvas; canvas = canvases[j]; j++) {
+                var imageMeasure = setImageMeasures(layout, targetCanvas, j),
+                sourceCoordinates = setSourceCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
+                targetCoordinates = setTargetCoordinates(targetCanvas, layout, imageMeasure.width, imageMeasure.height, j),
+                coeficient = calculateCoeficient(targetCanvas, canvas);
 
-              context.drawImage(canvas, sourceCoordinates.x, sourceCoordinates.y, imageMeasure.width * coeficient.width, imageMeasure.height * coeficient.height, targetCoordinates.x, targetCoordinates.y, imageMeasure.width, imageMeasure.height);
+                context.drawImage(canvas, sourceCoordinates.x, sourceCoordinates.y, imageMeasure.width * coeficient.width, imageMeasure.height * coeficient.height, targetCoordinates.x, targetCoordinates.y, imageMeasure.width, imageMeasure.height);
+              }
+
+              layoutOptions.append(targetCanvas);
             }
-
-            layoutOptions.append(targetCanvas);
           }
         },
 
