@@ -24,7 +24,7 @@
          * but still sounds so weird having this here.
          */
         isFunction = function(f) {
-          return f && f.constructor === Function;
+          return typeof f === 'function';
         },
 
         initCamera = function () {
@@ -32,7 +32,7 @@
             alert('Camera access is not available in your browser');
           } else {
             camera = new JpegCamera('#camera')
-              .ready(function () {
+              .ready(function (resoltution) {
                 /**
                  * Something you'd need to do if the camera is ready.
                  */
@@ -57,19 +57,19 @@
           } else {
             if (Layouts.isVertical(layout)) {
               return {
-                width: $(targetCanvas).width(),
-                height: $(targetCanvas).height() / images.length
+                width: targetCanvas.width,
+                height: targetCanvas.height / images.length
               };
             } else if (Layouts.isHorizontal(layout)) {
               return {
-                width: $(targetCanvas).width() / images.length,
-                height: $(targetCanvas).height()
+                width: targetCanvas.width / images.length,
+                height: targetCanvas.height
               };
             }
 
             return {
-              width: $(targetCanvas).width(),
-              height: $(targetCanvas).height()
+              width: targetCanvas.width,
+              height: targetCanvas.height
             };
           }
         },
